@@ -1,0 +1,121 @@
+blueprint:
+  name: Baby room climate report
+  description: >-
+    At a chosen time (19:00 by default), read the bedroom temperature and
+    humidity sensors, work out how many clothing layers the baby should wear,
+    and push the reading to one or more phones.
+
+  domain: automation
+  homeassistant:
+    min_version: "2023.7.0"
+
+  input:
+    temperature_sensor:
+      name: Bedroom temperature sensor
+      description: Entity reporting the bedroom air temperature in °C.
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: temperature
+
+    humidity_sensor:
+      name: Bedroom humidity sensor
+      description: Entity reporting the bedroom relative humidity in %.
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: humidity
+
+    report_time:
+      name: Report time
+      description: Local time of the daily report.
+      default: "19:00:00"
+      selector:
+        time:
+
+    notify_target:
+      name: Phones to notify
+      description: >-
+        Pick the notify service (for example notify.mobile_app_phone) and every
+        device that should receive it. Add several devices for several phones.
+      selector:
+        action:
+
+    baby_name:
+      name: Baby name
+      description: Used in the notification title.
+      default: Baby
+
+mode: single
+max_exceeded: silent
+
+trigger:
+  - platform: time_pattern
+    hours: "{{ input.report_time.split(':')[0] }}"
+    minutes: "{{ input.report_time.split(':')[1] }}"
+    seconds: "0"
+
+variables:
+  baby: "{{ input.baby_name }}"
+
+  temperature: "{{ states(input.temperature_sensor) | float(none) }}"
+  humidity: "{{ states(input.humidity_sensor) | float(none) }}"
+  humidity_value: >-
+    {{- 'unknown' if humidity is none else (humidity | round(0) | string ~ '%') -}}
+
+  reading: >-
+    {%- if temperature is none -%}
+    sensor unavailable
+    {%- elif temperature <= 10 -%}
+    too cold ({{ temperature | round(1) }}°C)
+    {%- elif temperature <= 14 -%}
+    cool ({{ temperature | round(1) }}°C)
+    {%- elif temperature <= 18 -%}
+    mild ({{ temperature | round(1) }}°C)
+    {%- elif temperature <= 22 -%}
+    comfortable ({{ temperature | round(1) }}°C)
+    {%- elif temperature <= 25 -%}
+    warm ({{ temperature | round(1) }}°C)
+    {%- else -%}
+    hot ({{ temperature | round(1) }}°C)
+    {%- endif -%}
+
+  layers: >-
+    {%- if temperature is none -%}
+    unknown — check the temperature sensor
+    {%- elif temperature <= 10 -%}
+    4 layers: bodysuit + vest + fleece pyjama + cardigan. Check the room is not draughty.
+    {%- elif temperature <= 14 -%}
+    3 layers: bodysuit + fleece pyjama + light cardigan.
+    {%- elif temperature <= 18 -%}
+    2 layers: bodysuit + pyjama.
+    {%- elif temperature <= 22 -%}
+    2 light layers: bodysuit + pyjama, no cardigan.
+    {%- elif temperature <= 25 -%}
+    1 light layer: bodysuit only, or just a vest under the pyjama.
+    {%- else -%}
+    1 minimum layer: nappy and a light vest. Check for overheating.
+    {%- endif -%}
+
+  humidity_note: >-
+    {%- if humidity is none -%}
+    Humidity sensor unavailable.
+    {%- elif humidity < 30 -%}
+    Dry air ({{ humidity | round(0) }}%). Consider a humidifier or damp towel on the radiator.
+    {%- elif humidity > 65 -%}
+    Humid ({{ humidity | round(0) }}%). Use breathable cotton, air the room, watch for condensation and mould.
+    {%- else -%}
+    Humidity fine ({{ humidity | round(0) }}%).
+    {%- endif -%}
+
+action:
+  - alias: Send the daily bedroom report to every phone
+    action: "{{ input.notify_target }}"
+    data:
+        title: "{{ baby }}'s bedroom"
+        message: >-
+          Room feels {{ reading }}. Humidity: {{ humidity_value }}.
+          Clothing: {{ layers }} {{ humidity_note }}
+    continue_on_error: true

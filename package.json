@@ -1,0 +1,14 @@
+{
+  "name": "ha-baby-room-climate-report",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Home Assistant blueprint: daily baby bedroom temperature/humidity report with clothing layer advice",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test_blueprint.cjs"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.1.0",
+    "nunjucks": "^3.2.4"
+  }
+}
