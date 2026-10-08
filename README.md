@@ -6,6 +6,8 @@ and pushes the reading to as many phones as you target.
 
 ## Install
 
+[![Open your Home Assistant instance and add blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fe-dupuis%2Fha-baby-room-climate-report%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fbaby_room_climate_report.yaml)
+
 **HACS (custom repository)**
 
 1. Add this repo to HACS as a *custom repository* of type **Blueprint**.
