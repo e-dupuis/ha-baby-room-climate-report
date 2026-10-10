@@ -33,8 +33,8 @@ blueprint:
     notify_target:
       name: Phones to notify
       description: >-
-        Pick the notify service (for example notify.mobile_app_phone) and every
-        device that should receive it. Add several devices for several phones.
+        Pick a single notify service (e.g. notify.mobile_app_phone or a notify group
+        for multiple phones). Add several devices to the group in HA Settings → People → Notify groups.
       selector:
         action:
     baby_name:
@@ -47,10 +47,10 @@ max_exceeded: silent
 
 trigger:
   - platform: time
-    at: "{{ input.report_time }}"
+    at: !input report_time
 
 variables:
-  baby: "{{ input.baby_name }}"
+  baby: !input baby_name
 
   temperature: "{{ states(input.temperature_sensor) | float(none) }}"
   humidity: "{{ states(input.humidity_sensor) | float(none) }}"
@@ -104,7 +104,7 @@ variables:
 
 action:
   - alias: Send the daily bedroom report to every phone
-    action: "{{ input.notify_target }}"
+    action: !input notify_target
     data:
       title: "{{ baby }}'s bedroom"
       message: >-
