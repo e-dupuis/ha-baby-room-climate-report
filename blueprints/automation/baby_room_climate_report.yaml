@@ -114,8 +114,8 @@ action:
   - alias: Send the daily bedroom report to every phone
     action: "{{ input.notify_target }}"
     data:
-        title: "{{ baby }}'s bedroom"
-        message: >-
-          Room feels {{ reading }}. Humidity: {{ humidity_value }}.
-          Clothing: {{ layers }} {{ humidity_note }}
+      title: "{{ baby }}'s bedroom"
+      message: >-
+        Room feels {{ reading }}. Humidity: {{ humidity_value }}.
+        Clothing: {{ layers }} {{ humidity_note }}
     continue_on_error: true
