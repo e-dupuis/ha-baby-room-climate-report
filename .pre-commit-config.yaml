@@ -1,0 +1,42 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: https://github.com/pre-commit/mirrors-yamlfmt
+    rev: v0.12.0
+    hooks:
+      - id: yamlfmt
+        args: ['-formatter', 'retain_line_comments=true']
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yaml']
+
+  - repo: local
+    hooks:
+      - id: ha-blueprint-lint
+        name: HA Blueprint lint
+        entry: python3 -c "
+import yaml, sys
+try:
+    with open(sys.argv[1]) as f:
+        d = yaml.safe_load(f)
+    assert d.get('blueprint', {}).get('domain') == 'automation'
+    assert 'input' in d
+    assert 'trigger' in d
+    assert 'action' in d
+    print('OK:', sys.argv[1])
+except Exception as e:
+    print('FAIL:', sys.argv[1], e)
+    sys.exit(1)
+"
+        language: system
+        types: [yaml]
+        files: 'blueprints/automation/.*\.ya?ml$'
