@@ -4,11 +4,9 @@ blueprint:
     At a chosen time (19:00 by default), read the bedroom temperature and
     humidity sensors, work out how many clothing layers the baby should wear,
     and push the reading to one or more phones.
-
   domain: automation
   homeassistant:
     min_version: "2023.7.0"
-
   input:
     temperature_sensor:
       name: Bedroom temperature sensor
@@ -18,7 +16,6 @@ blueprint:
           filter:
             - domain: sensor
               device_class: temperature
-
     humidity_sensor:
       name: Bedroom humidity sensor
       description: Entity reporting the bedroom relative humidity in %.
@@ -27,14 +24,12 @@ blueprint:
           filter:
             - domain: sensor
               device_class: humidity
-
     report_time:
       name: Report time
       description: Local time of the daily report.
       default: "19:00:00"
       selector:
         time:
-
     notify_target:
       name: Phones to notify
       description: >-
@@ -42,7 +37,6 @@ blueprint:
         device that should receive it. Add several devices for several phones.
       selector:
         action:
-
     baby_name:
       name: Baby name
       description: Used in the notification title.
@@ -52,10 +46,8 @@ mode: single
 max_exceeded: silent
 
 trigger:
-  - platform: time_pattern
-    hours: "{{ input.report_time.split(':')[0] }}"
-    minutes: "{{ input.report_time.split(':')[1] }}"
-    seconds: "0"
+  - platform: time
+    at: "{{ input.report_time }}"
 
 variables:
   baby: "{{ input.baby_name }}"
