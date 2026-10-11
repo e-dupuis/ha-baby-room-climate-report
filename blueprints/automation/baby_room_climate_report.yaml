@@ -30,13 +30,15 @@ blueprint:
       default: "19:00:00"
       selector:
         time:
-    notify_target:
-      name: Phones to notify
+    notify_service:
+      name: Notify service
       description: >-
-        Pick a single notify service (e.g. notify.mobile_app_phone or a notify group
-        for multiple phones). Add several devices to the group in HA Settings → People → Notify groups.
+        The notify service to call (e.g. notify.mobile_app_phone).
+        For multiple phones, create a notify group in HA
+        (Settings → People → Notify groups) and use that group's service name.
+      default: "notify.mobile_app_phone"
       selector:
-        action:
+        text:
     baby_name:
       name: Baby name
       description: Used in the notification title.
@@ -104,7 +106,7 @@ variables:
 
 action:
   - alias: Send the daily bedroom report to every phone
-    action: !input notify_target
+    action: !input notify_service
     data:
       title: "{{ baby }}'s bedroom"
       message: >-
