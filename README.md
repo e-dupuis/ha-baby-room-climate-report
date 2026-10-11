@@ -30,15 +30,16 @@ Baby room climate report.**
 | Bedroom temperature sensor | A `sensor` with device class temperature, e.g. `sensor.bedroom_temperature` |
 | Bedroom humidity sensor | A `sensor` with device class humidity, e.g. `sensor.bedroom_humidity` |
 | Report time | Defaults to 19:00:00 |
-| Phones to notify | The `notify.mobile_app_*` service; add every phone you want in one automation |
+| Phones to notify | A notify entity, such as a Notify group helper containing the phones |
 | Baby name | Used in the notification title |
 
 Save, then enable the automation. To check it without waiting, use
 **Run actions** on the automation's ⋮ menu.
 
-For several phones, prefer a single notify group
-(**Settings → People → Notify groups**) and select that group in the UI, so one
-automation covers every device.
+For several phones, create a **Notify group** helper under
+**Settings → Devices & services → Helpers**, add both phone notify entities,
+then select the resulting `notify.*` entity here. The blueprint sends through
+`notify.send_message`; legacy notify actions/services are not selectable.
 
 ## Layers it recommends
 

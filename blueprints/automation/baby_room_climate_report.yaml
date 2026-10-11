@@ -6,7 +6,7 @@ blueprint:
     and push the reading to one or more phones.
   domain: automation
   homeassistant:
-    min_version: "2023.7.0"
+    min_version: "2026.5.0"
   input:
     temperature_sensor:
       name: Bedroom temperature sensor
@@ -33,10 +33,12 @@ blueprint:
     notify_target:
       name: Phones to notify
       description: >-
-        Pick a notify service (e.g. notify.mobile_app_phone) and the devices
-        to target. For multiple phones, add all devices in the service call.
+        Pick a notify entity, such as a Notify group helper containing both
+        phones. Create the group under Settings > Devices & services > Helpers.
       selector:
-        action:
+        entity:
+          filter:
+            - domain: notify
     baby_name:
       name: Baby name
       description: Used in the notification title.
@@ -106,7 +108,9 @@ variables:
 
 action:
   - alias: Send the daily bedroom report to every phone
-    action: !input notify_target
+    action: notify.send_message
+    target:
+      entity_id: !input notify_target
     data:
       title: "{{ baby }}'s bedroom"
       message: >-
