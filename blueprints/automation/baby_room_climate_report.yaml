@@ -30,15 +30,13 @@ blueprint:
       default: "19:00:00"
       selector:
         time:
-    notify_service:
-      name: Notify service
+    notify_target:
+      name: Phones to notify
       description: >-
-        The notify service to call (e.g. notify.mobile_app_phone).
-        For multiple phones, create a notify group in HA
-        (Settings → People → Notify groups) and use that group's service name.
-      default: "notify.mobile_app_phone"
+        Pick a notify service (e.g. notify.mobile_app_phone) and the devices
+        to target. For multiple phones, add all devices in the service call.
       selector:
-        text:
+        action:
     baby_name:
       name: Baby name
       description: Used in the notification title.
@@ -53,9 +51,11 @@ trigger:
 
 variables:
   baby: !input baby_name
+  temp_sensor: !input temperature_sensor
+  hum_sensor: !input humidity_sensor
 
-  temperature: "{{ states(input.temperature_sensor) | float(none) }}"
-  humidity: "{{ states(input.humidity_sensor) | float(none) }}"
+  temperature: "{{ states(temp_sensor) | float(none) }}"
+  humidity: "{{ states(hum_sensor) | float(none) }}"
   humidity_value: >-
     {{- 'unknown' if humidity is none else (humidity | round(0) | string ~ '%') -}}
 
@@ -106,7 +106,7 @@ variables:
 
 action:
   - alias: Send the daily bedroom report to every phone
-    action: !input notify_service
+    action: !input notify_target
     data:
       title: "{{ baby }}'s bedroom"
       message: >-
